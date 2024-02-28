@@ -1,4 +1,3 @@
-# integration_test_keylogger.py
 import unittest
 import threading
 import time
@@ -7,18 +6,30 @@ from keylogger_GUI import KeyloggerGUI, run_gui
 from keylogger_enhancement import KeyloggerEnhancements
 
 class TestKeyloggerIntegration(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         # Create instances of KeyloggerCore, KeyloggerGUI, and KeyloggerEnhancements
-        self.keylogger_core = KeyloggerCore()
-        self.gui_thread = threading.Thread(target=run_gui)
-        self.gui_thread.start()
+        cls.keylogger_core = KeyloggerCore()
+        cls.gui_thread = threading.Thread(target=run_gui)
+        cls.gui_thread.start()
         time.sleep(1)  # Allow time for GUI to initialize
-        self.keylogger_gui = KeyloggerGUI(root=None)
-        self.keylogger_enhancements = KeyloggerEnhancements()
+        cls.keylogger_gui = KeyloggerGUI(root=None)
+        cls.keylogger_enhancements = KeyloggerEnhancements()
+
+    @classmethod
+    def tearDownClass(cls):
+        # Stop the GUI thread
+        cls.gui_thread.join()
+
+    def setUp(self):
+        # Ensure keylogger is not running at the beginning of each test
+        self.keylogger_core.stop_keylogger()
+        self.keylogger_gui.stop_keylogger()
 
     def tearDown(self):
-        # Stop the GUI thread
-        self.gui_thread.join()
+        # Ensure keylogger is stopped after each test
+        self.keylogger_core.stop_keylogger()
+        self.keylogger_gui.stop_keylogger()
 
     def test_gui_and_core_interaction(self):
         # Test if GUI and KeyloggerCore interact as expected
